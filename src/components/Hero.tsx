@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-milk-bottles.jpg";
 
 const Hero = () => {
@@ -24,8 +25,8 @@ const Hero = () => {
           Experience the pure taste of farm-fresh dairy products delivered straight to your doorstep. Quality you can trust, freshness you can taste.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button size="lg" className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all">
-            Shop Now
+          <Button size="lg" className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all" asChild>
+            <Link to="/products">Shop Now</Link>
           </Button>
           <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-full">
             Learn More
