@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import wholeMilkImage from "@/assets/whole-milk.jpg";
 import yogurtImage from "@/assets/yogurt.jpg";
 import cheeseImage from "@/assets/cheese.jpg";
@@ -12,6 +13,7 @@ import paneerImage from "@/assets/paneer.jpg";
 
 const Products = () => {
   const [activeCategory, setActiveCategory] = useState("all");
+  const { getItemCount } = useCart();
 
   const allProducts = [
     {
@@ -129,11 +131,22 @@ const Products = () => {
       {/* Header */}
       <header className="bg-card border-b border-border">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center justify-between mb-4">
             <Link to="/">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 Back to Home
+              </Button>
+            </Link>
+            <Link to="/cart" className="relative">
+              <Button variant="outline" size="sm" className="gap-2">
+                <ShoppingCart className="w-4 h-4" />
+                Cart
+                {getItemCount() > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                    {getItemCount()}
+                  </span>
+                )}
               </Button>
             </Link>
           </div>
