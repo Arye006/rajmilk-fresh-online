@@ -196,8 +196,11 @@ const Cart = () => {
                     onClick={handleCheckout}
                     className="w-full text-lg py-6"
                     size="lg"
+                    asChild
                   >
-                    Proceed to Checkout
+                    <Link to="/checkout">
+                      Proceed to Checkout
+                    </Link>
                   </Button>
                   
                   <Link to="/products">
