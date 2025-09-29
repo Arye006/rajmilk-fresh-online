@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,9 +11,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import type { Profile, Order, OrderItem } from "@/types/database";
 
 const checkoutSchema = z.object({
   name: z.string()
@@ -54,47 +51,15 @@ const Checkout = () => {
   const { items, getTotalPrice } = useCart();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
   });
-
-  // Load user profile data to pre-fill form
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!user) return;
-      
-      try {
-        const { data, error } = await (supabase as any)
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (data) {
-          setValue('name', data.full_name || '');
-          setValue('email', data.email || '');
-          setValue('phone', data.phone || '');
-          setValue('address', data.delivery_address || '');
-        } else {
-          // Fallback to user metadata
-          setValue('name', user.user_metadata?.full_name || '');
-          setValue('email', user.email || '');
-        }
-      } catch (error) {
-        console.error('Error loading profile:', error);
-      }
-    };
-
-    loadProfile();
-  }, [user, setValue]);
 
   // Redirect to cart if empty
   if (items.length === 0) {
@@ -103,89 +68,22 @@ const Checkout = () => {
   }
 
   const onSubmit = async (data: CheckoutFormData) => {
-    if (!user) {
-      toast({
-        title: "Please log in",
-        description: "You need to be logged in to place an order.",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      return;
-    }
-
     setIsProcessing(true);
     
     try {
-      // Save order to Supabase
-      const deliveryFee = 20;
-      const subtotal = getTotalPrice();
-      const total = subtotal + deliveryFee;
-
-      // Create order
-      const { data: orderData, error: orderError } = await (supabase as any)
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          customer_name: data.name,
-          customer_email: data.email,
-          customer_phone: data.phone,
-          delivery_address: `${data.address}, ${data.city} - ${data.zipCode}`,
-          delivery_notes: data.notes || null,
-          subtotal: subtotal,
-          delivery_fee: deliveryFee,
-          total_amount: total,
-          status: 'pending',
-        })
-        .select()
-        .single();
-
-      if (orderError) {
-        throw orderError;
-      }
-
-      if (!orderData?.id) {
-        throw new Error('Order creation failed');
-      }
-
-      // Create order items
-      const orderItems = items.map(item => ({
-        order_id: orderData.id,
-        product_name: item.name,
-        quantity: item.quantity,
-        unit_price: parseFloat(item.price.replace('₹', '').replace(/\/.*/, '')),
-        total_price: parseFloat(item.price.replace('₹', '').replace(/\/.*/, '')) * item.quantity,
-      }));
-
-      const { error: itemsError } = await (supabase as any)
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) {
-        throw itemsError;
-      }
-
-      // Update user profile with delivery info if not already set
-      await (supabase as any)
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          email: data.email,
-          full_name: data.name,
-          phone: data.phone,
-          delivery_address: `${data.address}, ${data.city} - ${data.zipCode}`,
-        });
-
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       toast({
         title: "Order placed successfully!",
-        description: `Order #${orderData.id} has been received. We'll deliver your fresh dairy products soon!`,
+        description: "Thank you for your order. We'll deliver your fresh dairy products soon!",
       });
       
-      // Clear cart and navigate
+      // In a real app, you would process payment and clear cart
       navigate("/");
     } catch (error) {
-      console.error('Error placing order:', error);
       toast({
-        title: "Order failed",
+        title: "Payment failed",
         description: "Please try again or contact support.",
         variant: "destructive",
       });

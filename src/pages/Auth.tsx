@@ -11,7 +11,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { z } from "zod";
 import { Milk } from "lucide-react";
-import type { Profile } from "@/types/database";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -107,7 +106,7 @@ const Auth = () => {
 
       const redirectUrl = `${window.location.origin}/`;
       
-      const { data: authData, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,
         options: {
@@ -117,22 +116,6 @@ const Auth = () => {
           },
         },
       });
-
-      // Create profile record in our profiles table
-      if (!error && authData.user) {
-        const { error: profileError } = await (supabase as any)
-          .from('profiles')
-          .insert({
-            user_id: authData.user.id,
-            email: validatedData.email,
-            full_name: validatedData.name,
-          });
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-          // Note: We don't show this error to user as the auth was successful
-        }
-      }
 
       if (error) {
         toast({
