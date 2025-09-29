@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 import { z } from "zod";
 import { Milk } from "lucide-react";
 
@@ -26,6 +28,7 @@ const registerSchema = z.object({
 });
 
 const Auth = () => {
+  const { user } = useAuth();
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -44,6 +47,13 @@ const Auth = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
