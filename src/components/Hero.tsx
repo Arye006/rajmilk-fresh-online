@@ -12,17 +12,24 @@ const Hero = () => {
       <div className="absolute top-0 left-0 right-0 z-20 p-6">
         <div className="container mx-auto flex justify-between items-center">
           <h2 className="text-2xl font-bold text-primary">Raj Milk Center</h2>
-          <Link to="/cart" className="relative">
-            <Button variant="outline" size="sm" className="gap-2 bg-white/90 hover:bg-white">
-              <ShoppingCart className="w-4 h-4" />
-              Cart
-              {getItemCount() > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                  {getItemCount()}
-                </span>
-              )}
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/auth">
+              <Button variant="outline" size="sm" className="bg-white/90 hover:bg-white">
+                Login
+              </Button>
+            </Link>
+            <Link to="/cart" className="relative">
+              <Button variant="outline" size="sm" className="gap-2 bg-white/90 hover:bg-white">
+                <ShoppingCart className="w-4 h-4" />
+                Cart
+                {getItemCount() > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                    {getItemCount()}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
